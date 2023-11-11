@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "page.h"
+#include "virt.h"
 
 void uart_write(uint8_t c)
 {
@@ -18,10 +19,10 @@ void kmain(void)
     virt_enable(&kernel_table);
 
     char *s = "Hello World!\r\n";
-    uint8_t *n = virt_page_alloc(1);
+    uint8_t *n = virt_page_alloc(&kernel_table, 1);
     for (int i = 0; s[i]; i++) n[i] = s[i];
     do uart_write(*n); while (*++n);
-    virt_page_free(n);
+    virt_page_free(&kernel_table, n);
 
     for (;;) uart_write(uart_read());
 }
