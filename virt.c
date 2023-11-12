@@ -33,6 +33,7 @@ void virt_page_unmap(PageTable *table, size_t vaddr)
     // leaky because we never free the page tables other than when we free the whole table
     uint64_t *entry = virt_page_get(table, vaddr, 2);
     *entry = 0;
+    asm volatile("sfence.vma %0, zero" :: "r"(vaddr));
 }
 
 void virt_table_free(PageTable *table)
@@ -117,9 +118,14 @@ uint8_t *virt_pages_alloc(PageTable *table, size_t pages, uint64_t bits)
 void virt_pages_free(PageTable *table, uint8_t *vaddr)
 {
     uint64_t *entry;
-    while (!(*(entry = virt_page_get(table, (size_t)vaddr, 2)) & ENTRY_L))
+    for (;;)
     {
+        entry = virt_page_get(table, (size_t)vaddr, 2);
+        page_free((uint8_t *)(*entry << 2), 1);
+        uint64_t v = *entry;
         *entry = 0;
+        asm volatile("sfence.vma %0, zero" :: "r"(vaddr));
+        if (v & ENTRY_L) break;
         vaddr += PAGE_SIZE;
     }
 }

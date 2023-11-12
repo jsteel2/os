@@ -1,5 +1,6 @@
 .section .text
 
+# um i think we wanna set M registers, just do what ch4 boot.S does.
 .global asm_virt_enable
 asm_virt_enable:
     csrw satp, a0
