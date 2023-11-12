@@ -1,7 +1,7 @@
 ENTRY(_start);
 
 ram = 0x80000000;
-ram_size = 128M;
+ram_size = 17M;
 . = ram;
  
 SECTIONS {

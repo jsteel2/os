@@ -28,6 +28,13 @@ void kprint_hex(uint64_t n)
     else kprint_char(remainder - 10 + 'A');
 }
 
+void kprint_dec(uint64_t n)
+{
+    if (n >= 10) kprint_dec(n / 10);
+
+    kprint_char(n % 10 + '0');
+}
+
 void kprint_str(char *s)
 {
     do kprint_char(*s); while (*++s);
@@ -43,10 +50,11 @@ void kprintf(char *format, ...)
         if (*format == '%')
         {
             format++;
-            switch (*format++)
+            switch (*format)
             {
                 case '%': uart_write('%'); break;
                 case 'x': kprint_hex(va_arg(v, uint64_t)); break;
+                case 'd': kprint_dec(va_arg(v, uint64_t)); break;
                 case 's': kprint_str(va_arg(v, char *)); break;
             }
         }

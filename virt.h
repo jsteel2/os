@@ -32,6 +32,7 @@ extern size_t _data_end;
 extern PageTable kernel_table;
 
 void virt_enable();
+uint64_t *virt_page_get(PageTable *table, size_t vaddr, int level);
 uint8_t *virt_pages_alloc(PageTable *table, size_t pages, uint64_t bits);
 void virt_pages_free(PageTable *table, uint8_t *vaddr);
 
