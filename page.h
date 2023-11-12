@@ -15,6 +15,7 @@ extern size_t _heap_size;
 
 extern uint8_t *page_start;
 extern uint8_t *alloc_start;
+extern uint8_t *alloc_end;
 
 void page_init();
 uint8_t *page_alloc(size_t *pages, uint8_t **start);

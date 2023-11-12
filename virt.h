@@ -14,8 +14,9 @@
 #define ENTRY_G (1 << 5)
 #define ENTRY_A (1 << 6)
 #define ENTRY_D (1 << 7)
+#define ENTRY_L (1 << 8)
 
-typedef struct __attribute__((packed))
+typedef struct
 {
     uint64_t entries[PAGE_TABLE_ENTRIES];
 } PageTable;
@@ -30,9 +31,9 @@ extern size_t _data_start;
 extern size_t _data_end;
 extern PageTable kernel_table;
 
-void virt_enable(PageTable *table);
-uint8_t *virt_page_alloc(PageTable *table, size_t pages);
-void virt_page_free(PageTable *table, uint8_t *p);
+void virt_enable();
+uint8_t *virt_pages_alloc(PageTable *table, size_t pages, uint64_t bits);
+void virt_pages_free(PageTable *table, uint8_t *vaddr);
 
 extern void asm_virt_enable(uint64_t satp);
 

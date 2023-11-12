@@ -16,13 +16,12 @@ uint8_t uart_read()
 void kmain(void)
 {
     page_init();
-    virt_enable(&kernel_table);
+    virt_enable();
 
     char *s = "Hello World!\r\n";
-    uint8_t *n = virt_page_alloc(&kernel_table, 1);
+    uint8_t *n = virt_pages_alloc(&kernel_table, 1, ENTRY_R | ENTRY_W);
     for (int i = 0; s[i]; i++) n[i] = s[i];
     do uart_write(*n); while (*++n);
-    virt_page_free(&kernel_table, n);
 
     for (;;) uart_write(uart_read());
 }
