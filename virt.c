@@ -3,11 +3,11 @@
 
 PageTable kernel_table;
 
-uint64_t *virt_page_get(PageTable *table, size_t vaddr, int level)
+uint64_t *virt_page_get(PageTable *table, size_t vaddr, unsigned level, PageSize size)
 {
     uint16_t vpn[] = {(vaddr >> 12) & 0x1ff, (vaddr >> 21) & 0x1ff, (vaddr >> 30) & 0x1ff};
 
-    if (level == 0) return &table->entries[vpn[0]];
+    if (level == size || (table->entries[vpn[level]] & 0xf) > ENTRY_V) return &table->entries[vpn[level]];
 
     if (!(table->entries[vpn[level]] & ENTRY_V))
     {
@@ -18,20 +18,20 @@ uint64_t *virt_page_get(PageTable *table, size_t vaddr, int level)
         table->entries[vpn[level]] = ((size_t)page >> 2) | ENTRY_V;
     }
     PageTable *next = (PageTable *)((table->entries[vpn[level]] & ~0x3ff) << 2);
-    return virt_page_get(next, vaddr, level - 1);
+    return virt_page_get(next, vaddr, level - 1, size);
 }
 
-void virt_page_map(PageTable *table, size_t vaddr, size_t paddr, uint64_t bits)
+void virt_page_map(PageTable *table, size_t vaddr, size_t paddr, uint64_t bits, PageSize size)
 {
     uint16_t ppn[] = {(paddr >> 12) & 0x1ff, (paddr >> 21) & 0x1ff, (paddr >> 30) & 0x3ffffff};
-    uint64_t *entry = virt_page_get(table, vaddr, 2);
+    uint64_t *entry = virt_page_get(table, vaddr, 2, size);
     *entry = (ppn[2] << 28) | (ppn[1] << 19) | (ppn[0] << 10) | bits | ENTRY_V;
 }
 
 void virt_page_unmap(PageTable *table, size_t vaddr)
 {
     // leaky because we never free the page tables other than when we free the whole table
-    uint64_t *entry = virt_page_get(table, vaddr, 2);
+    uint64_t *entry = virt_page_get(table, vaddr, 2, PAGE_GET);
     *entry = 0;
     asm volatile("sfence.vma %0, zero" :: "r"(vaddr));
 }
@@ -41,14 +41,33 @@ void virt_table_free(PageTable *table)
     // TODO
 }
 
-void virt_range_map(PageTable *table, size_t vstart, size_t pstart, size_t length, uint64_t bits)
+void virt_range_map(PageTable *table, size_t vstart, size_t pstart, int64_t length, uint64_t bits)
 {
     size_t vaddr = vstart & ~(PAGE_SIZE - 1);
     size_t paddr = pstart & ~(PAGE_SIZE - 1);
 
-    for (size_t i = 0; i <= length; i += PAGE_SIZE, vaddr += PAGE_SIZE, paddr += PAGE_SIZE)
+    while (length >= 0)
     {
-        virt_page_map(table, vaddr, paddr, bits);
+        uint64_t n = PAGE_SIZE;
+
+        if (length >= PAGE_SIZE << 9 << 9 && (vaddr & ((PAGE_SIZE << 9 << 9) - 1)) == 0)
+        {
+            virt_page_map(table, vaddr, paddr, bits, PAGE_1G);
+            n = PAGE_SIZE << 9 << 9;
+        }
+        else if (length >= PAGE_SIZE << 9 && (vaddr & ((PAGE_SIZE << 9) - 1)) == 0)
+        {
+            virt_page_map(table, vaddr, paddr, bits, PAGE_2M);
+            n = PAGE_SIZE << 9;
+        }
+        else
+        {
+            virt_page_map(table, vaddr, paddr, bits, PAGE_4K);
+        }
+
+        vaddr += n;
+        paddr += n;
+        length -= n;
     }
 }
 
@@ -82,12 +101,14 @@ size_t virt_pages_find(PageTable *table, size_t pages)
     for (size_t i = PAGE_SIZE; continuous < pages; i += PAGE_SIZE)
     {
         if (continuous == 0) vaddr = i;
-        if (*virt_page_get(table, i, 2) & ENTRY_V) continuous = 0;
+        if (*virt_page_get(table, i, 2, PAGE_GET) & ENTRY_V) continuous = 0;
         else continuous++;
     }
 
     return vaddr;
 }
+
+// make these compatible with huge pages, and virt_page_unmap too
 
 uint8_t *virt_pages_alloc(PageTable *table, size_t pages, uint64_t bits)
 {
@@ -103,7 +124,7 @@ uint8_t *virt_pages_alloc(PageTable *table, size_t pages, uint64_t bits)
         if (pages == 0)
         {
             if (alloced > 1) virt_range_map(table, i, paddr, (alloced - 1) * PAGE_SIZE, bits);
-            virt_page_map(table, i + (alloced - 1) * PAGE_SIZE, paddr + (alloced - 1) * PAGE_SIZE, bits | ENTRY_L);
+            virt_page_map(table, i + (alloced - 1) * PAGE_SIZE, paddr + (alloced - 1) * PAGE_SIZE, bits | ENTRY_L, PAGE_4K);
         }
         else
         {
@@ -120,7 +141,7 @@ void virt_pages_free(PageTable *table, uint8_t *vaddr)
     uint64_t *entry;
     for (;;)
     {
-        entry = virt_page_get(table, (size_t)vaddr, 2);
+        entry = virt_page_get(table, (size_t)vaddr, 2, PAGE_GET);
         page_free((uint8_t *)(*entry << 2), 1);
         uint64_t v = *entry;
         *entry = 0;

@@ -26,4 +26,4 @@ clean:
 
 run: $(BIN)
 	@echo '!!!!!!!!!!! INCASE YOU FORGET, ITS CTRL+A X TO EXIT !!!!!!!!!!!!!'
-	qemu-system-riscv64 -kernel $(BIN) -bios none -machine virt -nographic -m 17
+	qemu-system-riscv64 -kernel $(BIN) -bios none -machine virt -nographic -m 640

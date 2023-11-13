@@ -21,6 +21,14 @@ typedef struct
     uint64_t entries[PAGE_TABLE_ENTRIES];
 } PageTable;
 
+typedef enum
+{
+    PAGE_4K,
+    PAGE_2M,
+    PAGE_1G,
+    PAGE_GET = PAGE_4K
+} PageSize;
+
 extern size_t _text_start;
 extern size_t _text_end;
 extern size_t _bss_start;
@@ -32,7 +40,7 @@ extern size_t _data_end;
 extern PageTable kernel_table;
 
 void virt_enable();
-uint64_t *virt_page_get(PageTable *table, size_t vaddr, int level);
+uint64_t *virt_page_get(PageTable *table, size_t vaddr, unsigned level, PageSize size);
 uint8_t *virt_pages_alloc(PageTable *table, size_t pages, uint64_t bits);
 void virt_pages_free(PageTable *table, uint8_t *vaddr);
 

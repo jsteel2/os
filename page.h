@@ -7,9 +7,6 @@
 #define PAGE_ORDER 12
 #define PAGE_SIZE (1 << PAGE_ORDER)
 
-#define PAGE_FREE 0
-#define PAGE_TAKEN 1
-
 extern size_t _heap_start;
 extern size_t _heap_size;
 
