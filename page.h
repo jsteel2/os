@@ -7,8 +7,8 @@
 #define PAGE_ORDER 12
 #define PAGE_SIZE (1 << PAGE_ORDER)
 
-extern size_t _heap_start;
-extern size_t _heap_size;
+extern size_t HEAP_START;
+extern size_t HEAP_SIZE;
 
 extern uint8_t *page_start;
 extern uint8_t *alloc_start;

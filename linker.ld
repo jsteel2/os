@@ -1,11 +1,10 @@
 ENTRY(_start);
 
 ram = 0x80000000;
-ram_size = 640M;
+ram_size = 32M;
 . = ram;
  
 SECTIONS {
-	/* Include entry point at start of binary */
 	.text : ALIGN(4K) {
         PROVIDE(_text_start = .);
 		*(.init);
@@ -34,7 +33,6 @@ SECTIONS {
 
     . = ALIGN(4K);
 
-    /* when accessing these values (and the ones above), use an & beforehand */
     PROVIDE(_memory_start = ram);
     PROVIDE(_memory_end = ram + ram_size);
     PROVIDE(_heap_start = .);

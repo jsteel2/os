@@ -12,9 +12,9 @@ static size_t align_order(size_t val, size_t order)
 
 void page_init()
 {
-    page_start = (uint8_t *)&_heap_start;
+    page_start = (uint8_t *)HEAP_START;
 
-    size_t num_pages = (size_t)&_heap_size / PAGE_SIZE;
+    size_t num_pages = HEAP_SIZE / PAGE_SIZE;
     for (size_t i = 0; i < num_pages / 8; i++) page_start[i] = 0;
 
     alloc_start = (uint8_t *)align_order((size_t)page_start + num_pages / 8, PAGE_ORDER);

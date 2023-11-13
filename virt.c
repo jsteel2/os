@@ -1,6 +1,9 @@
 #include "virt.h"
 #include "page.h"
 
+// if we catch any paging bugs, figure out https://blog.stephenmarz.com/2021/02/01/wrong-about-sfence/
+// because i dont think we're using sfence.vma correctly
+
 PageTable kernel_table;
 
 uint64_t *virt_page_get(PageTable *table, size_t vaddr, unsigned level, PageSize size)
@@ -80,10 +83,10 @@ void virt_enable()
 {
     for (size_t i = 0; i < sizeof(PageTable) / sizeof(*kernel_table.entries); i++) kernel_table.entries[i] = 0;
 
-    virt_identity_map(&kernel_table, (size_t)&_text_start, (size_t)&_text_end, ENTRY_R | ENTRY_X);
-    virt_identity_map(&kernel_table, (size_t)&_bss_start, (size_t)&_bss_end, ENTRY_R | ENTRY_W);
-    virt_identity_map(&kernel_table, (size_t)&_rodata_start, (size_t)&_rodata_end, ENTRY_R);
-    virt_identity_map(&kernel_table, (size_t)&_data_start, (size_t)&_data_end, ENTRY_R | ENTRY_W);
+    virt_identity_map(&kernel_table, TEXT_START, TEXT_END, ENTRY_R | ENTRY_X);
+    virt_identity_map(&kernel_table, BSS_START, BSS_END, ENTRY_R | ENTRY_W);
+    virt_identity_map(&kernel_table, RODATA_START, RODATA_END, ENTRY_R);
+    virt_identity_map(&kernel_table, DATA_START, DATA_END, ENTRY_R | ENTRY_W);
 
     virt_identity_map(&kernel_table, (size_t)page_start, (size_t)alloc_end, ENTRY_R | ENTRY_W);
 

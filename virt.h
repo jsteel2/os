@@ -29,14 +29,14 @@ typedef enum
     PAGE_GET = PAGE_4K
 } PageSize;
 
-extern size_t _text_start;
-extern size_t _text_end;
-extern size_t _bss_start;
-extern size_t _bss_end;
-extern size_t _rodata_start;
-extern size_t _rodata_end;
-extern size_t _data_start;
-extern size_t _data_end;
+extern size_t TEXT_START;
+extern size_t TEXT_END;
+extern size_t BSS_START;
+extern size_t BSS_END;
+extern size_t RODATA_START;
+extern size_t RODATA_END;
+extern size_t DATA_START;
+extern size_t DATA_END;
 extern PageTable kernel_table;
 
 void virt_enable();
