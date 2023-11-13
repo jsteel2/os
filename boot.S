@@ -12,7 +12,7 @@ _start:
     la gp, _global_pointer
 .option pop
 
-    la sp, _stack_top
+    la sp, _stack_end
 
     la a0, _bss_start
     la a1, _bss_end
@@ -21,17 +21,13 @@ _start:
     addi a0, a0, 8
     bltu a0, a1, .bss_clear # clear BSS
 
-    li t0, (0b11 << 11) | (1 << 7) | (1 << 3)
-    csrw mstatus, t0 # set protection and interrupt modes
+    li t0, 0b11 << 11
+    csrw mstatus, t0
 
     la t1, kmain
     csrw mepc, t1 # set kernel function to jump to
 
-    la t2, asm_trap_vector
-    csrw mtvec, t2 # set trap vector
-
-    li t3, (1 << 3) | (1 << 7) | (1 << 11)
-    csrw mie, t3 # enable interrupts
+    csrw mie, zero # disable interrupts
 
     la ra, halt
     mret

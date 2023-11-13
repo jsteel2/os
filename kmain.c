@@ -2,6 +2,7 @@
 #include "page.h"
 #include "virt.h"
 #include "kprint.h"
+#include "trap.h"
 
 extern size_t MEMORY_START;
 extern size_t MEMORY_END;
@@ -9,6 +10,7 @@ extern size_t MEMORY_END;
 void kmain(void)
 {
     page_init();
+    clint_set();
     virt_enable();
 
     char *s = "Hello World!";
@@ -34,7 +36,6 @@ void kmain(void)
     kprintf("Total of %dMiB physical memory free.\r\n", (HEAP_SIZE - mem_used) / 1024 / 1024);
     kprintf("Total of %dMiB physical memory in total.\r\n", (MEMORY_END - MEMORY_START) / 1024 / 1024);
     virt_pages_free(&kernel_table, n);
-    kprintf("Now, Page Fault: %s", n);
 
     for (;;);
 }

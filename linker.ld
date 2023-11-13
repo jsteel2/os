@@ -14,9 +14,9 @@ SECTIONS {
 	.bss : ALIGN(4K) {
 		PROVIDE(_bss_start = .);
 		*(.bss);
+        PROVIDE(_stack_start = .);
 		. += 4096;
-		PROVIDE(_stack_top = .);
-		. += 4096;
+        PROVIDE(_stack_end = .);
 		PROVIDE(_global_pointer = .);
 		PROVIDE(_bss_end = .);
 	}

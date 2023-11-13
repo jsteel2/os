@@ -1,10 +1,12 @@
 #include "virt.h"
 #include "page.h"
+#include "trap.h"
 
 // if we catch any paging bugs, figure out https://blog.stephenmarz.com/2021/02/01/wrong-about-sfence/
 // because i dont think we're using sfence.vma correctly
 
 PageTable kernel_table;
+Frame trap_frame;
 
 uint64_t *virt_page_get(PageTable *table, size_t vaddr, unsigned level, PageSize size)
 {
@@ -92,16 +94,25 @@ void virt_enable()
 
     virt_identity_map(&kernel_table, 0x10000000, 0x10000005, ENTRY_R | ENTRY_W);
 
-    asm_virt_enable(((size_t)&kernel_table >> 12) | ((size_t)8 << 60));
+    uint64_t satp = ((size_t)&kernel_table >> 12) | ((size_t)8 << 60);
+
+    trap_frame.satp = satp;
+    size_t x = 1;
+    uint8_t *y = NULL;
+    trap_frame.trap_stack = page_alloc(&x, &y) + PAGE_SIZE;
+    
+    virt_identity_map(&kernel_table, (size_t)trap_frame.trap_stack - PAGE_SIZE, (size_t)trap_frame.trap_stack, ENTRY_R | ENTRY_W);
+
+    asm_virt_enable(satp, (uint64_t)&trap_frame);
 }
 
-size_t virt_pages_find(PageTable *table, size_t pages)
+size_t virt_pages_find(PageTable *table, size_t pages, size_t start)
 {
     // this could be optimized by doing the old function (just nicer), it should still be in git logs under virt_page_alloc
     size_t continuous = 0;
     size_t vaddr = 0;
 
-    for (size_t i = PAGE_SIZE; continuous < pages; i += PAGE_SIZE)
+    for (size_t i = start; continuous < pages; i += PAGE_SIZE)
     {
         if (continuous == 0) vaddr = i;
         if (*virt_page_get(table, i, 2, PAGE_GET) & ENTRY_V) continuous = 0;
@@ -115,7 +126,7 @@ size_t virt_pages_find(PageTable *table, size_t pages)
 
 uint8_t *virt_pages_alloc(PageTable *table, size_t pages, uint64_t bits)
 {
-    size_t vaddr = virt_pages_find(table, pages);
+    size_t vaddr = virt_pages_find(table, pages, PAGE_SIZE);
 
     uint8_t *start = NULL;
     size_t i = vaddr;
