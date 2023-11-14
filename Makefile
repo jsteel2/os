@@ -3,7 +3,7 @@ TRIPLET=riscv64-unknown-elf
 AS=$(TRIPLET)-as
 CC=$(TRIPLET)-gcc
 LD=$(TRIPLET)-ld
-OBJ=boot.o trap_vector.o kmain.o page.o virt_enable.o virt.o kprint.o symbols.o trap.o
+OBJ=boot.o trap_vector.o kmain.o page.o virt_enable.o virt.o kprint.o symbols.o trap.o plic.o uart.o
 
 CFLAGS=-Wall -Wextra -O3 -mcmodel=medany -ffreestanding
 LDFLAGS=-T linker.ld -nostdlib

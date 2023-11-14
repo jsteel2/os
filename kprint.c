@@ -1,17 +1,7 @@
 #include "kprint.h"
+#include "uart.h"
 #include <stdarg.h>
 #include <stdint.h>
-
-void uart_write(uint8_t c)
-{
-    *((volatile uint8_t *)0x10000000) = c;
-}
-
-uint8_t uart_read()
-{
-    if ((*((volatile uint8_t *)0x10000005) & 1) == 0) return 0;
-    return *((volatile uint8_t *)0x10000000);
-}
 
 void kprint_char(char c)
 {
@@ -54,8 +44,10 @@ void kprintf(char *format, ...)
             {
                 case '%': uart_write('%'); break;
                 case 'x': kprint_hex(va_arg(v, uint64_t)); break;
+                case 'c': kprint_char(va_arg(v, int)); break;
                 case 'd': kprint_dec(va_arg(v, uint64_t)); break;
                 case 's': kprint_str(va_arg(v, char *)); break;
+                default: kprintf("invalid format %%%c", *format); break;
             }
         }
         else

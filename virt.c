@@ -1,6 +1,8 @@
 #include "virt.h"
 #include "page.h"
+#include "plic.h"
 #include "trap.h"
+#include "uart.h"
 
 // if we catch any paging bugs, figure out https://blog.stephenmarz.com/2021/02/01/wrong-about-sfence/
 // because i dont think we're using sfence.vma correctly
@@ -92,7 +94,7 @@ void virt_enable()
 
     virt_identity_map(&kernel_table, (size_t)page_start, (size_t)alloc_end, ENTRY_R | ENTRY_W);
 
-    virt_identity_map(&kernel_table, 0x10000000, 0x10000005, ENTRY_R | ENTRY_W);
+    virt_identity_map(&kernel_table, (size_t)UART, (size_t)UART, ENTRY_R | ENTRY_W);
 
     uint64_t satp = ((size_t)&kernel_table >> 12) | ((size_t)8 << 60);
 
@@ -101,8 +103,6 @@ void virt_enable()
     uint8_t *y = NULL;
     trap_frame.trap_stack = page_alloc(&x, &y) + PAGE_SIZE;
     
-    virt_identity_map(&kernel_table, (size_t)trap_frame.trap_stack - PAGE_SIZE, (size_t)trap_frame.trap_stack, ENTRY_R | ENTRY_W);
-
     asm_virt_enable(satp, (uint64_t)&trap_frame);
 }
 
