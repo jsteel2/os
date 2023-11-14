@@ -135,32 +135,22 @@ uint8_t *virt_pages_alloc(PageTable *table, size_t pages, uint64_t bits)
         size_t b = pages;
         size_t paddr = (size_t)page_alloc(&pages, &start);
         size_t alloced = b - pages;
-        if (pages == 0)
-        {
-            if (alloced > 1) virt_range_map(table, i, paddr, (alloced - 1) * PAGE_SIZE, bits);
-            virt_page_map(table, i + (alloced - 1) * PAGE_SIZE, paddr + (alloced - 1) * PAGE_SIZE, bits | ENTRY_L, PAGE_4K);
-        }
-        else
-        {
-            virt_range_map(table, i, paddr, alloced * PAGE_SIZE, bits);
-        }
+        virt_range_map(table, i, paddr, alloced * PAGE_SIZE, bits);
         i += alloced * PAGE_SIZE;
     }
 
     return (uint8_t *)vaddr;
 }
 
-void virt_pages_free(PageTable *table, uint8_t *vaddr)
+void virt_pages_free(PageTable *table, uint8_t *vaddr, size_t pages)
 {
     uint64_t *entry;
-    for (;;)
+    for (size_t i = 0; i < pages; i++)
     {
         entry = virt_page_get(table, (size_t)vaddr, 2, PAGE_GET);
         page_free((uint8_t *)(*entry << 2), 1);
-        uint64_t v = *entry;
         *entry = 0;
         asm volatile("sfence.vma %0, zero" :: "r"(vaddr));
-        if (v & ENTRY_L) break;
         vaddr += PAGE_SIZE;
     }
 }

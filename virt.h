@@ -14,7 +14,6 @@
 #define ENTRY_G (1 << 5)
 #define ENTRY_A (1 << 6)
 #define ENTRY_D (1 << 7)
-#define ENTRY_L (1 << 8)
 
 typedef struct
 {
@@ -42,7 +41,7 @@ extern PageTable kernel_table;
 void virt_enable();
 uint64_t *virt_page_get(PageTable *table, size_t vaddr, unsigned level, PageSize size);
 uint8_t *virt_pages_alloc(PageTable *table, size_t pages, uint64_t bits);
-void virt_pages_free(PageTable *table, uint8_t *vaddr);
+void virt_pages_free(PageTable *table, uint8_t *vaddr, size_t pages);
 
 extern void asm_virt_enable(uint64_t satp, uint64_t trap_frame);
 
