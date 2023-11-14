@@ -2,6 +2,8 @@
 #include "kmem.h"
 #include "page.h"
 
+// https://github.com/blanham/liballoc
+
 BoundaryTag *free_pages[MAXEXP] = {0};
 int complete_pages[MAXEXP] = {0};
 
@@ -48,7 +50,7 @@ void insert_tag(BoundaryTag *tag, int index)
 {
     if (index < 0)
     {
-        index = getexp(tag->size - sizeof(BoundaryTag));
+        index = getexp(tag->real_size - sizeof(BoundaryTag));
         if (index < MINEXP) index = MINEXP;
     }
 
@@ -145,6 +147,8 @@ void *malloc(size_t size)
 
 void free(void *p)
 {
+    if (!p) return;
+
     BoundaryTag *tag = p - sizeof(BoundaryTag);
 
     while (tag->split_left && tag->split_left->index >= 0)
@@ -174,4 +178,32 @@ void free(void *p)
     }
 
     insert_tag(tag, index);
+}
+
+void *realloc(void *p, size_t size)
+{
+    if (size == 0)
+    {
+        free(p);
+        return NULL;
+    }
+
+    if (!p) return malloc(size);
+
+    BoundaryTag *tag = p - sizeof(BoundaryTag);
+
+    if (size < tag->real_size)
+    {
+        tag->size = size;
+        return p;
+    }
+
+    // moving memory around like this is unneeded since we have virtual memory
+    // but im not sure how that would work with this allocator
+    // but this is only used in the kernel anyway so..
+    void *ret = malloc(size);
+    for (size_t i = 0; i < tag->size; i++) ((uint8_t *)ret)[i] = ((uint8_t *)p)[i];
+    free(p);
+
+    return ret;
 }
