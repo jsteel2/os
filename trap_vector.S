@@ -1,15 +1,6 @@
 .section .text
 
-.altmacro
-.set NUM_GP_REGS, 32
-.set REG_SIZE, 8
-
-.macro save_gp i, basereg=t6
-	sd	x\i, ((\i)*REG_SIZE)(\basereg)
-.endm
-.macro load_gp i, basereg=t6
-	ld	x\i, ((\i)*REG_SIZE)(\basereg)
-.endm
+.include "macros.S"
 
 .option norvc
 .global m_trap_vector
@@ -18,7 +9,7 @@ m_trap_vector:
     csrrw t6, mscratch, t6
 
     .set i, 1
-    .rept 30
+    .rept 31
         save_gp %i
         .set i, i + 1
     .endr
@@ -30,12 +21,14 @@ m_trap_vector:
     csrw mscratch, t5
 
     csrr a0, mepc
+    sd a0, 520(t5)
     csrr a1, mtval
     csrr a2, mcause
     csrr a3, mhartid
     csrr a4, mstatus
-    mv a5, t5
-    ld sp, 520(a5)
+    csrr a5, mscratch
+    la t0, STACK_END
+    ld sp, 0(t0)
     call m_trap
 
     csrw mepc, a0

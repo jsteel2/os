@@ -29,3 +29,8 @@ MEMORY_END: .dword _memory_end
 HEAP_START: .dword _heap_start
 .global HEAP_SIZE
 HEAP_SIZE: .dword _heap_size
+
+.global STACK_START
+STACK_START: .dword _stack_start
+.global STACK_END
+STACK_END: .dword _stack_end

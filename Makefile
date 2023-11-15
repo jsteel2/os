@@ -3,9 +3,13 @@ TRIPLET=riscv64-unknown-elf
 AS=$(TRIPLET)-as
 CC=$(TRIPLET)-gcc
 LD=$(TRIPLET)-ld
-OBJ=boot.o trap_vector.o kmain.o page.o virt_enable.o virt.o kprint.o symbols.o trap.o plic.o uart.o kmem.o
+DBG=$(TRIPLET)-gdb
+DEBUG?=false
+EMU=qemu-system-riscv64
+EMUFLAGS=-bios none -machine virt -nographic -m 32 `$(DEBUG) && echo -s -S` -kernel
+OBJ=boot.o trap_vector.o kmain.o page.o virt_enable.o virt.o kprint.o symbols.o trap.o plic.o uart.o kmem.o process.o user.o
 
-CFLAGS=-Wall -Wextra -O3 -mcmodel=medany -ffreestanding
+CFLAGS=-Wall -Wextra `$(DEBUG) && echo -Og -g || echo -O3` -mcmodel=medany -ffreestanding
 LDFLAGS=-T linker.ld -nostdlib
 
 all: $(BIN)
@@ -25,5 +29,5 @@ clean:
 	rm -f $(OBJ) $(BIN)
 
 run: $(BIN)
-	@echo '!!!!!!!!!!! INCASE YOU FORGET, ITS CTRL+A X TO EXIT !!!!!!!!!!!!!'
-	qemu-system-riscv64 -kernel $(BIN) -bios none -machine virt -nographic -m 32
+	@ $(DEBUG) || echo '!!!!!!!!!!! INCASE YOU FORGET, ITS CTRL+A X TO EXIT !!!!!!!!!!!!!'
+	$(DEBUG) && sh -c '$(EMU) $(EMUFLAGS) $(BIN) & $(DBG) -ex "target remote :1234" -ex "set confirm off" -ex "add-symbol-file $(BIN)"; kill $$!' || $(EMU) $(EMUFLAGS) $(BIN)

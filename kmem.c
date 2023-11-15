@@ -207,3 +207,10 @@ void *realloc(void *p, size_t size)
 
     return ret;
 }
+
+void *memset(void *s, int c, size_t n)
+{
+    uint8_t *p = s;
+    while (n--) *p++ = c;
+    return s;
+}

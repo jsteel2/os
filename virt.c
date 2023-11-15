@@ -7,7 +7,7 @@
 // if we catch any paging bugs, figure out https://blog.stephenmarz.com/2021/02/01/wrong-about-sfence/
 // because i dont think we're using sfence.vma correctly
 
-PageTable kernel_table;
+PageTable kernel_table = {0};
 Frame trap_frame;
 
 uint64_t *virt_page_get(PageTable *table, size_t vaddr, unsigned level, PageSize size)
@@ -85,8 +85,6 @@ void virt_identity_map(PageTable *table, size_t start, size_t end, uint64_t bits
 
 void virt_enable()
 {
-    for (size_t i = 0; i < sizeof(PageTable) / sizeof(*kernel_table.entries); i++) kernel_table.entries[i] = 0;
-
     virt_identity_map(&kernel_table, TEXT_START, TEXT_END, ENTRY_R | ENTRY_X);
     virt_identity_map(&kernel_table, BSS_START, BSS_END, ENTRY_R | ENTRY_W);
     virt_identity_map(&kernel_table, RODATA_START, RODATA_END, ENTRY_R);

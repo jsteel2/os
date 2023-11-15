@@ -15,35 +15,27 @@ void page_init()
     page_start = (uint8_t *)HEAP_START;
 
     size_t num_pages = HEAP_SIZE / PAGE_SIZE;
-    for (size_t i = 0; i < num_pages / 8; i++) page_start[i] = 0;
+    for (size_t i = 0; i < num_pages ; i++) page_start[i] = 0;
 
-    alloc_start = (uint8_t *)align_order((size_t)page_start + num_pages / 8, PAGE_ORDER);
+    alloc_start = (uint8_t *)align_order((size_t)page_start + num_pages, PAGE_ORDER);
     alloc_end = alloc_start + num_pages * PAGE_SIZE;
 }
 
 uint8_t *page_alloc(size_t *pages, uint8_t **start)
 {
-    // could be faster with more bitwise hacks or uint64_t
+    // reverted to bytes because the bits shit was buggy and i cant be fucked rn!!
     for (uint8_t *p = *start ? *start : page_start; p < alloc_start; p++)
     {
-        if (*p != 0xff)
+        if (*p == 0)
         {
-            uint8_t bit_mask = 0x80;
-            uint8_t bit_pos = 0;
-            while (*p & bit_mask)
-            {
-                bit_mask >>= 1;
-                bit_pos++;
-            }
+            uint8_t *ret = alloc_start + (p - page_start) * PAGE_SIZE;
             do
             {
-                *p ^= bit_mask;
+                *p = 1;
                 --*pages;
-                bit_mask >>= 1;
-                bit_pos++;
-            } while (*pages > 0 && *p ^ bit_mask && bit_mask);
+            } while (*pages > 0 && *++p == 0);
             *start = p;
-            return alloc_start + (p + bit_pos - page_start) * PAGE_SIZE;
+            return ret;
         }
     }
     return NULL;
@@ -51,5 +43,5 @@ uint8_t *page_alloc(size_t *pages, uint8_t **start)
 
 void page_free(uint8_t *p, size_t pages)
 {
-    for (size_t i = 0; i < pages; i++, p += PAGE_SIZE) page_start[(p - alloc_start) / PAGE_SIZE / 8] &= ~(0x80 >> (p - alloc_start) / PAGE_SIZE % 8);
+    for (size_t i = 0; i < pages; i++, p += PAGE_SIZE) page_start[(p - alloc_start) / PAGE_SIZE] = 0;
 }

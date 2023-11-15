@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include "page.h"
 
 #define PAGE_TABLE_ENTRIES 512
 
@@ -15,7 +16,7 @@
 #define ENTRY_A (1 << 6)
 #define ENTRY_D (1 << 7)
 
-typedef struct
+typedef struct __attribute__((aligned(PAGE_SIZE))) __attribute__((packed))
 {
     uint64_t entries[PAGE_TABLE_ENTRIES];
 } PageTable;
@@ -42,6 +43,7 @@ void virt_enable();
 uint64_t *virt_page_get(PageTable *table, size_t vaddr, unsigned level, PageSize size);
 uint8_t *virt_pages_alloc(PageTable *table, size_t pages, uint64_t bits);
 void virt_pages_free(PageTable *table, uint8_t *vaddr, size_t pages);
+void virt_range_map(PageTable *table, size_t vstart, size_t pstart, int64_t length, uint64_t bits);
 
 extern void asm_virt_enable(uint64_t satp, uint64_t trap_frame);
 

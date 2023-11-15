@@ -2,6 +2,7 @@
 #include "kprint.h"
 #include "plic.h"
 #include "uart.h"
+#include "process.h"
 #include <stdbool.h>
 
 void clint_set(void)
@@ -19,7 +20,7 @@ size_t m_trap(size_t mepc, size_t mtval, size_t mcause, size_t mhart, size_t mst
         switch (mcause_num)
         {
             case 3: kprintf("Machine software interrupt\r\n"); break;
-            case 7: kprintf("Machine timer interrupt\r\n"); clint_set(); break;
+            case 7: kprintf("Machine timer interrupt\r\n"); clint_set(); schedule(); break;
             case 11:
             {
                 uint32_t id = plic_next();
@@ -39,7 +40,7 @@ size_t m_trap(size_t mepc, size_t mtval, size_t mcause, size_t mhart, size_t mst
         {
             case 2: kprintf("PANIC: Illegal Instruction\r\n"); for (;;);
             case 8: kprintf("E-Call from User Mode\r\n"); return mepc + 4;
-            case 9: kprintf("E-Call from Supervisor Mode\r\n"); return mepc + 4;
+            case 9: kprintf("E-Call from Supervisor Mode, Starting up!\r\n"); schedule(); break;
             case 11: kprintf("PANIC: E-Call from Machine Mode\r\n"); for (;;);
             case 12: kprintf("PANIC: Instruction Page Fault at 0x%x\r\n", mtval); for (;;);
             case 13: kprintf("PANIC: Load Page Fault at 0x%x\r\n", mtval); for (;;);
