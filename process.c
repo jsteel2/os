@@ -20,5 +20,5 @@ void schedule(void)
 
     uint64_t satp = ((size_t)8 << 60) | ((size_t)cur_process->pid << 44) | ((size_t)cur_process->page_table >> 12);
 
-    asm_switch_to_user((uint64_t)&cur_process->frame, cur_process->pc, satp);
+    asm_switch_to_user((uint64_t)&cur_process->frame, cur_process->frame.pc, satp);
 }

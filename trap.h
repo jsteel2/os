@@ -10,7 +10,7 @@ typedef struct __attribute__((aligned(PAGE_SIZE))) __attribute__((packed))
     size_t regs[32];
     size_t fregs[32];
     size_t satp;
-    uint8_t *trap_stack;
+    uint64_t pc;
     size_t mhartid;
 } Frame;
 

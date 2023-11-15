@@ -1,7 +1,7 @@
 # le operating system
-goal is to port and run some UNIX-like programs
+goal is to port and run some UNIX-like programs (also i want to port it to x86_64 eventually so it can run on my own hardware)
 
-currently, not very close to this
+currently, not very close to this (i dont really know what im doing)
 
 all this code is probably shit and will bite me in the ass later, so if i were you i wouldnt use this as a reference
 

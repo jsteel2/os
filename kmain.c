@@ -56,13 +56,13 @@ void kmain(void)
     proc.frame = (Frame){0};
     proc.stack = (uint8_t *)STACK_END;
     proc.frame.regs[2] = STACK_ADDR + STACK_END - STACK_START;
-    proc.pc = 0x1000;
+    proc.frame.pc = 0x1000;
     proc.pid = 1;
     proc.page_table = &table;
     proc.state = PROCESS_RUNNING;
     proc.next = &proc;
     virt_range_map(&table, STACK_ADDR, (size_t)stack, sizeof(stack), ENTRY_U | ENTRY_R | ENTRY_W);
-    virt_range_map(&table, proc.pc, (size_t)userspace_init, 8192, ENTRY_U | ENTRY_R | ENTRY_X);
+    virt_range_map(&table, proc.frame.pc, (size_t)userspace_init, 8192, ENTRY_U | ENTRY_R | ENTRY_X);
     add_process(&proc);
 
     asm volatile("ecall"); // start scheduling user processes

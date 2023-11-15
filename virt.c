@@ -97,9 +97,6 @@ void virt_enable()
     uint64_t satp = ((size_t)&kernel_table >> 12) | ((size_t)8 << 60);
 
     trap_frame.satp = satp;
-    size_t x = 1;
-    uint8_t *y = NULL;
-    trap_frame.trap_stack = page_alloc(&x, &y) + PAGE_SIZE;
     
     asm_virt_enable(satp, (uint64_t)&trap_frame);
 }

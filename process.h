@@ -15,7 +15,6 @@ struct _process
 {
     Frame frame;
     uint8_t *stack;
-    uint64_t pc;
     uint16_t pid;
     PageTable *page_table;
     ProcessState state;
