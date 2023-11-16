@@ -20,6 +20,9 @@ m_trap_vector:
 
     csrw mscratch, t5
 
+    csrr t1, satp
+    sd t1, 512(t5)
+
     csrr a0, mepc
     sd a0, 520(t5)
     csrr a1, mtval

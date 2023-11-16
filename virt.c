@@ -94,6 +94,9 @@ void virt_enable()
 
     virt_identity_map(&kernel_table, (size_t)UART, (size_t)UART, ENTRY_R | ENTRY_W);
 
+    virt_identity_map(&kernel_table, (size_t)MTIME, (size_t)MTIME, ENTRY_R | ENTRY_W);
+    virt_identity_map(&kernel_table, (size_t)MTIMECMP, (size_t)MTIMECMP, ENTRY_R | ENTRY_W);
+
     uint64_t satp = ((size_t)&kernel_table >> 12) | ((size_t)8 << 60);
 
     trap_frame.satp = satp;
@@ -148,4 +151,9 @@ void virt_pages_free(PageTable *table, uint8_t *vaddr, size_t pages)
         asm volatile("sfence.vma %0, zero" :: "r"(vaddr));
         vaddr += PAGE_SIZE;
     }
+}
+
+size_t virt_to_phys(PageTable *table, size_t vaddr)
+{
+    return (*virt_page_get(table, vaddr, 2, PAGE_GET) << 2 & ~0x3ff) + (vaddr & 0xfff);
 }

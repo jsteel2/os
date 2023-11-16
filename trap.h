@@ -5,6 +5,9 @@
 #include <stddef.h>
 #include "page.h"
 
+#define MTIME ((uint64_t *)0x200bff8)
+#define MTIMECMP ((uint64_t *)0x2004000)
+
 typedef struct __attribute__((aligned(PAGE_SIZE))) __attribute__((packed))
 {
     size_t regs[32];

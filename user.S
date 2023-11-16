@@ -4,9 +4,17 @@
 
 .global asm_switch_to_user
 asm_switch_to_user:
+    li t0, (1 << 7) | (1 << 5)
+    j switch
+
+.global asm_switch_to_supervisor
+asm_switch_to_supervisor:
+    li t0, (1 << 11) | (1 << 7) | (1 << 5)
+    j switch
+
+switch:
     csrw mscratch, a0
 
-    li t0, (1 << 7) | (1 << 5)
     csrw mstatus, t0
 
     csrw mepc, a1

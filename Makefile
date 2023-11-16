@@ -7,7 +7,7 @@ DBG=$(TRIPLET)-gdb
 DEBUG?=false
 EMU=qemu-system-riscv64
 EMUFLAGS=-bios none -machine virt -nographic -m 32 `$(DEBUG) && echo -s -S` -kernel
-OBJ=boot.o trap_vector.o kmain.o page.o virt_enable.o virt.o kprint.o symbols.o trap.o plic.o uart.o kmem.o process.o user.o
+OBJ=boot.o trap_vector.o kmain.o page.o virt_enable.o virt.o kprint.o symbols.o trap.o plic.o uart.o kmem.o process.o user.o syscall.o
 
 CFLAGS=-Wall -Wextra `$(DEBUG) && echo -Og -g || echo -O3` -mcmodel=medany -ffreestanding
 LDFLAGS=-T linker.ld -nostdlib

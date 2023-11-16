@@ -44,6 +44,7 @@ uint64_t *virt_page_get(PageTable *table, size_t vaddr, unsigned level, PageSize
 uint8_t *virt_pages_alloc(PageTable *table, size_t pages, uint64_t bits);
 void virt_pages_free(PageTable *table, uint8_t *vaddr, size_t pages);
 void virt_range_map(PageTable *table, size_t vstart, size_t pstart, int64_t length, uint64_t bits);
+size_t virt_to_phys(PageTable *table, size_t vaddr);
 
 extern void asm_virt_enable(uint64_t satp, uint64_t trap_frame);
 
