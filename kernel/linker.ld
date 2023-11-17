@@ -1,0 +1,24 @@
+ENTRY(_start);
+
+. = 0x80200000;
+
+SECTIONS {
+	.text : ALIGN(4K) {
+		*(.text.init);
+		*(.text);
+	}
+	.bss : ALIGN(4K) {
+        PROVIDE(_BSS_START = .);
+		*(.bss);
+        PROVIDE(_STACK_START = .);
+        . += 4096;
+        PROVIDE(_STACK_END = .);
+        PROVIDE(_BSS_END = .);
+	}
+	.rodata : ALIGN(4K) {
+		*(.rodata);
+	}
+	.data : ALIGN(4K) {
+		*(.data);
+	}
+}
