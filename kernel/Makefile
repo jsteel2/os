@@ -5,7 +5,7 @@ CC=$(TRIPLET)-gcc
 AS=$(TRIPLET)-as
 LD=$(TRIPLET)-ld
 DBG=$(TRIPLET)-gdb
-CFLAGS=-Wall -Wextra `$(DEBUG) && echo -Og -g || echo -O3` -mcmodel=medany -ffreestanding
+CFLAGS=-Wall -Wextra `$(DEBUG) && echo -Og -g || echo -O3` -mcmodel=medany -ffreestanding -I../dtc/libfdt -I../opensbi/include/sbi
 ASFLAGS=`$(DEBUG) && echo -g`
 LDFLAGS=-T linker.ld -nostdlib
 DEBUG?=false
@@ -22,7 +22,7 @@ all: $(BIN)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(BIN): $(OBJ)
-	$(LD) $(LDFLAGS) -o $@ $(OBJ)
+	$(LD) $(LDFLAGS) -o $@ $(OBJ) ../dtc/libfdt/libfdt.a
 
 .PHONY: clean run
 

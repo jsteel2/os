@@ -4,6 +4,7 @@
 
 .global sbi_call
 sbi_call:
+# shits its pants when interrupted, FIXME
     addi t6, sp, -13 * 8
     csrw sscratch, t6
  

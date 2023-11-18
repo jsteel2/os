@@ -4,6 +4,8 @@
 #include "stdint.h"
 #include "page.h"
 
+// right now we dont actually need the alignment here, cuz we just pop this guy on the stack in trap.S
+// but thatll change when we add multicore
 typedef struct __attribute__((aligned(PAGE_SIZE))) __attribute__((packed))
 {
     usize regs[32];
