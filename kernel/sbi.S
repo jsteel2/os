@@ -5,6 +5,7 @@
 .global sbi_call
 sbi_call:
 # shits its pants when interrupted, FIXME
+# we can fix it by using the same sscratch structure as traps do
     addi t6, sp, -13 * 8
     csrw sscratch, t6
  

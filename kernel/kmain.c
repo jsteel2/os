@@ -4,6 +4,7 @@
 #include "kprint.h"
 #include "pmm.h"
 #include "entry.h"
+#include "time.h"
 #include <libfdt.h>
 
 void kmain_hart(usize hart)
@@ -15,6 +16,7 @@ void kmain_hart(usize hart)
 void kmain(usize hart, void *fdt)
 {
     uart_init(fdt);
+    time_init(fdt);
     pmm_init(fdt);
 
     int node_offset = -1;

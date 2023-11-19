@@ -4,6 +4,7 @@
 #include "sbi.h"
 #include "uart.h"
 #include "lock.h"
+#include "time.h"
 #include <libfdt.h>
 
 void kprint_char(char c)
@@ -74,7 +75,8 @@ void kprintf(const char *format, ...)
     lock_acquire(&lock);
     va_list v;
     va_start(v, format);
-    _kprintf("[%d] ", 69); // make this print mtime
+    u64 time = time_read();
+    _kprintf("[%d] ", time / (timebase_frequency / 1000));
     _vkprintf(format, v);
     _kprintf("\r\n");
     va_end(v);
