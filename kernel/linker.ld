@@ -3,6 +3,8 @@ ENTRY(_start);
 . = 0x80200000;
 
 SECTIONS {
+    PROVIDE(_KERNEL_START = .);
+
 	.text : ALIGN(4K) {
 		*(.text.init);
 		*(.text);
@@ -21,4 +23,7 @@ SECTIONS {
 	.data : ALIGN(4K) {
 		*(.data);
 	}
+
+    . = ALIGN(4K);
+    PROVIDE(_KERNEL_END = .);
 }

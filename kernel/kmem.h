@@ -10,5 +10,6 @@ void *memmove(void *dest, const void *src, usize n);
 void *memchr(const void *s, int c, usize n);
 char *strrchr(const char *s, int c);
 usize strnlen(const char *s, usize maxlen);
+void *memset(void *s, int c, usize n);
 
 #endif

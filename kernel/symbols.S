@@ -9,3 +9,8 @@ STACK_END: .dword _STACK_END
 BSS_START: .dword _BSS_START
 .global BSS_END
 BSS_END: .dword _BSS_END
+
+.global KERNEL_START
+KERNEL_START: .dword _KERNEL_START
+.global KERNEL_END
+KERNEL_END: .dword _KERNEL_END

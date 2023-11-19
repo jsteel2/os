@@ -3,6 +3,7 @@
 #include "stdarg.h"
 #include "sbi.h"
 #include "uart.h"
+#include "lock.h"
 #include <libfdt.h>
 
 void kprint_char(char c)
@@ -32,11 +33,10 @@ void kprint_str(char *s)
     do kprint_char(*s); while (*++s);
 }
 
-void kprintf(const char *format, ...)
-{
-    va_list v;
-    va_start(v, format);
+void _kprintf(const char *format, ...);
 
+void _vkprintf(const char *format, va_list v)
+{
     do
     {
         if (*format == '%')
@@ -49,7 +49,7 @@ void kprintf(const char *format, ...)
                 case 'c': kprint_char(va_arg(v, int)); break;
                 case 'd': kprint_dec(va_arg(v, u64)); break;
                 case 's': kprint_str(va_arg(v, char *)); break;
-                default: kprintf("invalid format %%%c", *format); break;
+                default: _kprintf("invalid format %%%c", *format); break;
             }
         }
         else
@@ -57,6 +57,26 @@ void kprintf(const char *format, ...)
             kprint_char(*format);
         }
     } while (*++format);
+}
 
+void _kprintf(const char *format, ...)
+{
+    va_list v;
+    va_start(v, format);
+    _vkprintf(format, v);
     va_end(v);
+}
+
+static Lock lock = 0;
+
+void kprintf(const char *format, ...)
+{
+    lock_acquire(&lock);
+    va_list v;
+    va_start(v, format);
+    _kprintf("[%d] ", 69); // make this print mtime
+    _vkprintf(format, v);
+    _kprintf("\r\n");
+    va_end(v);
+    lock_release(&lock);
 }

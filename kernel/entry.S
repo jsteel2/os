@@ -15,5 +15,13 @@ _start:
     addi t0, t0, 8
     bltu t0, t1, .bss_clear
 
-    mv a0, a1
     j kmain
+
+.global hart_entry
+hart_entry:
+    mv sp, a1
+.option push
+.option norelax
+    mv gp, sp
+.option pop
+    j kmain_hart

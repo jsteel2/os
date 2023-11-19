@@ -20,6 +20,8 @@ sbi_call:
     mv a7, a0
     mv a6, a1
     mv a0, a2
+    mv a1, a3
+    mv a2, a4
     ecall
 
     csrr t6, sscratch

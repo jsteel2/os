@@ -10,8 +10,9 @@ ASFLAGS=`$(DEBUG) && echo -g`
 LDFLAGS=-T linker.ld -nostdlib
 DEBUG?=false
 EMU=qemu-system-riscv64
-CORES?=1
-EMUFLAGS=-bios ../opensbi/build/platform/generic/firmware/fw_jump.elf -M virt -smp $(CORES) -nographic `$(DEBUG) && echo -s -S` -kernel $(BIN) 
+CORES?=4
+MEM?=128M
+EMUFLAGS=-bios ../opensbi/build/platform/generic/firmware/fw_jump.elf -M virt -smp $(CORES) -m $(MEM) -nographic `$(DEBUG) && echo -s -S` -kernel $(BIN)
 
 all: $(BIN)
 

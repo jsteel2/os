@@ -69,3 +69,10 @@ usize strnlen(const char *s, usize maxlen)
     const char *p = memchr(s, 0, maxlen);
     return p ? (usize)(p - s) : maxlen;
 }
+
+void *memset(void *s, int c, usize n)
+{
+    unsigned char *p = s;
+    while (n--) *p++ = c;
+    return s;
+}

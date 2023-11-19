@@ -2,7 +2,7 @@
 #define _TRAP_H
 
 #include "stdint.h"
-#include "page.h"
+#include "pmm.h"
 
 // right now we dont actually need the alignment here, cuz we just pop this guy on the stack in trap.S
 // but thatll change when we add multicore
