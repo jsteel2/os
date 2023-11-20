@@ -2,6 +2,7 @@
 #include <libfdt.h>
 
 u8 *uart = NULL;
+i32 uart_interrupt = -1;
 
 void uart_init(void *fdt)
 {
@@ -23,6 +24,14 @@ void uart_init(void *fdt)
     uart[0] = divisor & 0xff;
     uart[1] = divisor >> 8;
     uart[3] = 3;
+
+    prop = fdt_getprop(fdt, node_offset, "interrupts", NULL);
+    if (!prop) return;
+
+    uart_interrupt = fdt32_to_cpu(prop[0]);
+
+    uart[0] = 0;
+    uart[1] = 1;
 }
 
 void uart_write(u8 c)

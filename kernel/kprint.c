@@ -72,6 +72,10 @@ static Lock lock = 0;
 
 void kprintf(const char *format, ...)
 {
+    // this would spin forever if an interrupt handler uses kprintf while the lock is already acquired
+    // same goes for the PMM, i guess you cuold fix this by just disabling interrupts but thats kind of shit
+    // ithink what we wanna do is maybe have a kprintf without the lock for trap handlers
+    // and just dont allocate memory in trap handlers
     lock_acquire(&lock);
     va_list v;
     va_start(v, format);

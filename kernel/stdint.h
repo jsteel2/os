@@ -13,6 +13,8 @@ typedef signed int i32;
 typedef signed short i16;
 typedef signed char i8;
 
+typedef int bool;
+
 #define NULL ((void *)0)
 
 #endif

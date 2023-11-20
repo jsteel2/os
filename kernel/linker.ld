@@ -21,6 +21,7 @@ SECTIONS {
 		*(.rodata);
 	}
 	.data : ALIGN(4K) {
+        PROVIDE(_GLOBAL_POINTER = . + 0x800);
 		*(.data);
 	}
 

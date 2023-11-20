@@ -4,15 +4,12 @@
 #include "stdint.h"
 #include "pmm.h"
 
-// right now we dont actually need the alignment here, cuz we just pop this guy on the stack in trap.S
-// but thatll change when we add multicore
-typedef struct __attribute__((aligned(PAGE_SIZE))) __attribute__((packed))
+typedef struct __attribute__((packed))
 {
     usize regs[32];
     usize fregs[32];
-    usize satp;
-    usize pc;
-    usize mhartid;
+    usize hartid;
+    usize sbi_save[13];
 } TrapFrame;
 
 extern void trap_vector(void);

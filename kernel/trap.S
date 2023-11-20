@@ -6,8 +6,7 @@
 .global trap_vector
 .align 4
 trap_vector:
-    csrw sscratch, t6
-    la t6, STACK_END - 536
+    csrrw t6, sscratch, t6
 
     .set i, 1
     .rept 30
@@ -15,26 +14,24 @@ trap_vector:
         .set i, i + 1
     .endr
 
-    csrr t1, satp
-    sd t1, 512(t6)
+    mv t5, t6
+    csrrw t6, sscratch, t6
+    save_gp %i, %i, t5
 
     csrr a0, sepc
     csrr a1, stval
     csrr a2, scause
-    #csrr a3, mhartid HOW to get hart id?
-    csrr a4, sstatus
-    mv a5, t6
-    mv sp, t6
+    mv a3, t5
+    mv sp, t5
     call trap
 
     csrw sepc, a0
 
+    mv t6, sp
     .set i, 1
-    .rept 30
-        load_gp %i, %i, sp
+    .rept 31
+        load_gp %i, %i
         .set i, i + 1
     .endr
-
-    csrr t6, sscratch
 
     sret

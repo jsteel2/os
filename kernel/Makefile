@@ -5,10 +5,10 @@ CC=$(TRIPLET)-gcc
 AS=$(TRIPLET)-as
 LD=$(TRIPLET)-ld
 DBG=$(TRIPLET)-gdb
+DEBUG?=false
 CFLAGS=-Wall -Wextra `$(DEBUG) && echo -Og -g || echo -O3` -mcmodel=medany -ffreestanding -I../dtc/libfdt -I../opensbi/include/sbi
 ASFLAGS=`$(DEBUG) && echo -g`
 LDFLAGS=-T linker.ld -nostdlib
-DEBUG?=false
 EMU=qemu-system-riscv64
 CORES?=4
 MEM?=128M

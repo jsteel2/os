@@ -5,18 +5,28 @@
 #include "pmm.h"
 #include "entry.h"
 #include "time.h"
+#include "plic.h"
 #include <libfdt.h>
+
+// make that asm shit into a funcywunk
 
 void kmain_hart(usize hart)
 {
     kprintf("good morning from hartid %d", hart);
-    for (;;);
+    plic_start_hart(hart);
+    sbi_call(SBI_EXT_TIME, SBI_EXT_TIME_SET_TIMER, 0, 0, 0);
+    asm volatile("li t1, 0xaaa\n\tcsrw sie, t1");
+    asm volatile("mv t0, %0\n\tcsrw stvec, t0" :: "r"(trap_vector));
+    asm volatile("csrrsi zero, sstatus, 1 << 1");
+    for (;;) sbi_call(SBI_EXT_HSM, SBI_EXT_HSM_HART_SUSPEND, 0, 0, 0);
 }
 
 void kmain(usize hart, void *fdt)
 {
     uart_init(fdt);
     time_init(fdt);
+    plic_init(fdt);
+    plic_start_hart(hart); // why dont we get plic interrupts on any other harts
     pmm_init(fdt);
 
     int node_offset = -1;
@@ -32,11 +42,11 @@ void kmain(usize hart, void *fdt)
         }
     }
 
-    kprintf("good morning from hartid %d", hart);
+    kprintf("good morning from boot hartid %d", hart);
 
     sbi_call(SBI_EXT_TIME, SBI_EXT_TIME_SET_TIMER, 0, 0, 0);
     asm volatile("li t1, 0xaaa\n\tcsrw sie, t1");
     asm volatile("mv t0, %0\n\tcsrw stvec, t0" :: "r"(trap_vector));
     asm volatile("csrrsi zero, sstatus, 1 << 1");
-    for (;;);
+    for (;;) sbi_call(SBI_EXT_HSM, SBI_EXT_HSM_HART_SUSPEND, 0, 0, 0);
 }
