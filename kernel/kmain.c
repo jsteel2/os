@@ -26,7 +26,7 @@ void kmain(usize hart, void *fdt)
     uart_init(fdt);
     time_init(fdt);
     plic_init(fdt);
-    plic_start_hart(hart); // why dont we get plic interrupts on any other harts
+    plic_start_hart(hart);
     pmm_init(fdt);
 
     int node_offset = -1;

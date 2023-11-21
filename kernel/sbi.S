@@ -8,11 +8,13 @@ sbi_call:
     addi t6, t6, 520
 
     save_gp 2, 0
-    save_gp 8, 1
-    save_gp 9, 2
+    save_gp 3, 1
+    save_gp 4, 2
+    save_gp 8, 3
+    save_gp 9, 4
     .set i, 18
     .rept 9
-        save_gp %i, %i - 15
+        save_gp %i, %i - 13
         .set i, i + 1
     .endr
 
@@ -27,11 +29,13 @@ sbi_call:
     addi t6, t6, 520
 
     load_gp 2, 0
-    load_gp 8, 1
-    load_gp 9, 2
+    load_gp 3, 1
+    load_gp 4, 2
+    load_gp 8, 3
+    load_gp 9, 4
     .set i, 18
     .rept 9
-        load_gp %i, %i - 15
+        load_gp %i, %i - 13
         .set i, i + 1
     .endr
 

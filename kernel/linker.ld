@@ -12,6 +12,7 @@ SECTIONS {
 	.bss : ALIGN(4K) {
         PROVIDE(_BSS_START = .);
 		*(.bss);
+        *(.sbss);
         PROVIDE(_STACK_START = .);
         . += 4096;
         PROVIDE(_STACK_END = .);
@@ -23,8 +24,8 @@ SECTIONS {
 	.data : ALIGN(4K) {
         PROVIDE(_GLOBAL_POINTER = . + 0x800);
 		*(.data);
+        *(.sdata);
 	}
 
-    . = ALIGN(4K);
-    PROVIDE(_KERNEL_END = .);
+    PROVIDE(_KERNEL_END = ALIGN(4K));
 }

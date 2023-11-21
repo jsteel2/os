@@ -22,7 +22,7 @@ hart_entry:
     j kmain_hart
 
 setup_stack:
-    addi sp, sp, -624 # trapframe size
+    addi sp, sp, -632 # trapframe size
     csrw sscratch, sp
     sd a0, 512(sp)
 

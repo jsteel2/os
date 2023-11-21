@@ -18,6 +18,7 @@ usize trap(usize epc, usize tval, usize cause, TrapFrame *frame)
             case 9:
             {
                 u32 id = plic_next(frame->hartid);
+                if (!id) break;
                 switch (id)
                 {
                     case 10: kprintf("%c from hart id %d", *uart, frame->hartid); plic_claim(frame->hartid, id); break;

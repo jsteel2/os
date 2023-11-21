@@ -16,7 +16,7 @@ trap_vector:
 
     mv t5, t6
     csrrw t6, sscratch, t6
-    save_gp %i, %i, t5
+    save_gp 31, 31, t5
 
     csrr a0, sepc
     csrr a1, stval

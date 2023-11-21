@@ -9,7 +9,7 @@ typedef struct __attribute__((packed))
     usize regs[32];
     usize fregs[32];
     usize hartid;
-    usize sbi_save[13];
+    usize sbi_save[14];
 } TrapFrame;
 
 extern void trap_vector(void);
