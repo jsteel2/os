@@ -6,18 +6,16 @@
 #include "entry.h"
 #include "time.h"
 #include "plic.h"
+#include "vmm.h"
 #include <libfdt.h>
-
-// make that asm shit into a funcywunk
 
 void kmain_hart(usize hart)
 {
     kprintf("good morning from hartid %d", hart);
     plic_start_hart(hart);
+    vmm_enable(&kernel_vmm_table);
     sbi_call(SBI_EXT_TIME, SBI_EXT_TIME_SET_TIMER, 0, 0, 0);
-    asm volatile("li t1, 0xaaa\n\tcsrw sie, t1");
-    asm volatile("mv t0, %0\n\tcsrw stvec, t0" :: "r"(trap_vector));
-    asm volatile("csrrsi zero, sstatus, 1 << 1");
+    enable_interrupts();
     for (;;) sbi_call(SBI_EXT_HSM, SBI_EXT_HSM_HART_SUSPEND, 0, 0, 0);
 }
 
@@ -28,6 +26,8 @@ void kmain(usize hart, void *fdt)
     plic_init(fdt);
     plic_start_hart(hart);
     pmm_init(fdt);
+    vmm_init();
+    vmm_enable(&kernel_vmm_table);
 
     int node_offset = -1;
     while ((node_offset = fdt_node_offset_by_compatible(fdt, node_offset, "riscv")) >= 0)
@@ -45,8 +45,6 @@ void kmain(usize hart, void *fdt)
     kprintf("good morning from boot hartid %d", hart);
 
     sbi_call(SBI_EXT_TIME, SBI_EXT_TIME_SET_TIMER, 0, 0, 0);
-    asm volatile("li t1, 0xaaa\n\tcsrw sie, t1");
-    asm volatile("mv t0, %0\n\tcsrw stvec, t0" :: "r"(trap_vector));
-    asm volatile("csrrsi zero, sstatus, 1 << 1");
+    enable_interrupts();
     for (;;) sbi_call(SBI_EXT_HSM, SBI_EXT_HSM_HART_SUSPEND, 0, 0, 0);
 }

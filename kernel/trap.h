@@ -13,5 +13,6 @@ typedef struct __attribute__((packed))
 } TrapFrame;
 
 extern void trap_vector(void);
+extern void enable_interrupts(void);
 
 #endif

@@ -3,6 +3,9 @@
 
 #include "stdint.h"
 
+extern u64 plic;
+extern usize plic_size;
+
 void plic_init(void *fdt);
 void plic_enable(u32 id, usize hart);
 void plic_set_priority(u32 id, u8 priority);

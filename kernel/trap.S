@@ -2,6 +2,15 @@
 
 .include "macros.S"
 
+.global enable_interrupts
+enable_interrupts:
+    li t0, 0xaaa
+    csrw sie, t0
+    la t1, trap_vector
+    csrw stvec, t1
+    csrsi sstatus, 1 << 1
+    ret
+
 .option norvc
 .global trap_vector
 .align 4

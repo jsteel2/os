@@ -4,6 +4,7 @@
 #include "stdint.h"
 
 extern u8 *uart;
+extern usize uart_size;
 extern i32 uart_interrupt;
 
 void uart_init(void *fdt);

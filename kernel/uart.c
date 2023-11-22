@@ -2,6 +2,7 @@
 #include <libfdt.h>
 
 u8 *uart = NULL;
+usize uart_size = 0;
 i32 uart_interrupt = -1;
 
 void uart_init(void *fdt)
@@ -13,6 +14,7 @@ void uart_init(void *fdt)
     if (!prop) return;
 
     uart = (u8 *)(((u64)fdt32_to_cpu(prop[0]) << 32) | fdt32_to_cpu(prop[1]));
+    uart_size = ((u64)fdt32_to_cpu(prop[2]) << 32) | fdt32_to_cpu(prop[3]);
 
     // enable FIFO, interrupts and divisor rate stuff
     uart[3] = 3;

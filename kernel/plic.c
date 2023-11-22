@@ -5,6 +5,7 @@
 #include <libfdt.h>
 
 u64 plic;
+usize plic_size;
 
 void plic_init(void *fdt)
 {
@@ -15,6 +16,7 @@ void plic_init(void *fdt)
     if (!prop) goto err;
 
     plic = ((u64)fdt32_to_cpu(prop[0]) << 32) | fdt32_to_cpu(prop[1]);
+    plic_size = ((u64)fdt32_to_cpu(prop[2]) << 32) | fdt32_to_cpu(prop[3]);
 
     if (uart_interrupt >= 0) plic_set_priority(uart_interrupt, 1);
     return;

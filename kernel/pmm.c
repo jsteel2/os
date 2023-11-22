@@ -5,7 +5,7 @@
 #include "lock.h"
 #include <libfdt.h>
 
-usize pages;
+usize pmm_pages;
 u8 *page_map;
 u64 pmem_start;
 usize start = 0;
@@ -22,11 +22,11 @@ void pmm_init(void *fdt)
     u64 pmem_size = ((u64)fdt32_to_cpu(prop[2]) << 32) | fdt32_to_cpu(prop[3]);
 
     page_map = (u8 *)KERNEL_END;
-    pages = pmem_size / PAGE_SIZE;
-    memset(page_map, 0, pages);
+    pmm_pages = pmem_size / PAGE_SIZE;
+    memset(page_map, 0, pmm_pages);
 
     memset(page_map + (KERNEL_START - pmem_start) / PAGE_SIZE, 1, (KERNEL_END - KERNEL_START) / PAGE_SIZE);
-    memset(page_map + ((u64)page_map - pmem_start) / PAGE_SIZE, 1, pages / PAGE_SIZE);
+    memset(page_map + ((u64)page_map - pmem_start) / PAGE_SIZE, 1, pmm_pages / PAGE_SIZE);
 
     node_offset = fdt_path_offset(fdt, "/reserved-memory");
     if (node_offset < 0) return;
@@ -54,7 +54,7 @@ void *pmm_alloc(usize *n)
 {
     // make this into a bitmap someday
     lock_acquire(&lock);
-    for (; start < pages; start++)
+    for (; start < pmm_pages; start++)
     {
         if (!page_map[start])
         {
@@ -76,7 +76,9 @@ void *pmm_alloc(usize *n)
 
 void pmm_free(void *p, usize n)
 {
+    lock_acquire(&lock);
     usize loc = ((usize)p - pmem_start) / PAGE_SIZE;
     for (usize i = 0; i < n; i++) page_map[i + loc] = 0;
     start = loc;
+    lock_release(&lock);
 }
