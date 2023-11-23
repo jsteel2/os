@@ -4,6 +4,8 @@
 #include "uart.h"
 #include "plic.h"
 
+// add a per-table lock... somewhere
+
 VMMTable kernel_vmm_table = {0};
 
 u64 *vmm_walk(VMMTable *table, usize vaddr, PageLevel level, bool alloc)
