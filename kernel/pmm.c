@@ -78,20 +78,21 @@ void *pmm_alloc_continuous(usize n)
 {
     lock_acquire(&lock);
 
-    for (;start < pmm_pages; start++)
+    usize s = start;
+    for (; s < pmm_pages; s++)
     {
 n:
-        if (!page_map[start])
+        if (!page_map[s])
         {
             for (usize i = 0; i < n; i++)
             {
-                if (page_map[start + i])
+                if (page_map[s + i])
                 {
-                    start += i + 1;
+                    s += i + 1;
                     goto n;
                 }
             }
-            for (usize i = 0; i < n; i++) page_map[start + i] = 1;
+            for (usize i = 0; i < n; i++) page_map[s + i] = 1;
             lock_release(&lock);
             return (void *)pmem_start + start * PAGE_SIZE;
         }
