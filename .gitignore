@@ -2,3 +2,5 @@
 *.o
 compile_commands.json
 .cache
+*.img
+*.prv

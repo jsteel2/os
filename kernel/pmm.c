@@ -94,7 +94,7 @@ n:
             }
             for (usize i = 0; i < n; i++) page_map[s + i] = 1;
             lock_release(&lock);
-            return (void *)pmem_start + start * PAGE_SIZE;
+            return (void *)pmem_start + s * PAGE_SIZE;
         }
     }
 
