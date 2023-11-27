@@ -19,6 +19,9 @@ void plic_init(void *fdt)
     plic_size = ((u64)fdt32_to_cpu(prop[2]) << 32) | fdt32_to_cpu(prop[3]);
 
     if (uart_interrupt >= 0) plic_set_priority(uart_interrupt, 1);
+    // dont like that we're hardcoding the virtio mmio interrupt numbers
+    // we can get them from the fdt instead
+    for (usize i = 1; i <= 8; i++) plic_set_priority(i, 1);
     return;
 
 err:
@@ -59,6 +62,7 @@ void plic_claim(usize hart, u32 id)
 void plic_start_hart(usize hart)
 {
     plic_set_threshold(0, hart);
+    for (usize i = 1; i <= 8; i++) plic_enable(i, hart);
     if (uart_interrupt >= 0)
     {
         plic_enable(uart_interrupt, hart);

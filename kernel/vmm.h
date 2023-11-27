@@ -30,6 +30,7 @@ typedef struct __attribute__((aligned(PAGE_SIZE))) __attribute__((packed))
 } VMMTable;
 
 void vmm_init(void);
+void vmm_identity_map(VMMTable *table, usize start, usize len, u64 bits);
 extern void vmm_enable(VMMTable *table);
 
 extern VMMTable kernel_vmm_table;

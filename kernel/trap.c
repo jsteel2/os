@@ -21,9 +21,10 @@ usize trap(usize epc, usize tval, usize cause, TrapFrame *frame)
                 if (!id) break;
                 switch (id)
                 {
-                    case 10: kprintf("%c from hart id %d", *uart, frame->hartid); plic_claim(frame->hartid, id); break;
+                    case 10: kprintf("%c from hart id %d", *uart, frame->hartid); break;
                     default: kprintf("Unhandled PLIC Interrupt %d from hart id %d", id, frame->hartid); break;
                 }
+                plic_claim(frame->hartid, id);
                 break;
             }
             default: kprintf("Unhandled interrupt %d from hart id %d", cause_num, frame->hartid); break;

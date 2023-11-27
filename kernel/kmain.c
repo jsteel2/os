@@ -7,6 +7,7 @@
 #include "time.h"
 #include "plic.h"
 #include "vmm.h"
+#include "virtio.h"
 #include <libfdt.h>
 
 void kmain_hart(usize hart)
@@ -26,6 +27,7 @@ void kmain(usize hart, void *fdt)
     plic_init(fdt);
     plic_start_hart(hart);
     pmm_init(fdt);
+    virtio_init(fdt);
     vmm_init();
     vmm_enable(&kernel_vmm_table);
 
@@ -37,8 +39,7 @@ void kmain(usize hart, void *fdt)
         u32 cpu = fdt32_to_cpu(prop[0]);
         if (cpu != hart)
         {
-            usize x = 1;
-            sbi_call(SBI_EXT_HSM, SBI_EXT_HSM_HART_START, cpu, (u64)hart_entry, (u64)pmm_alloc(&x));
+            sbi_call(SBI_EXT_HSM, SBI_EXT_HSM_HART_START, cpu, (u64)hart_entry, (u64)pmm_alloc_continuous(1));
         }
     }
 

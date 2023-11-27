@@ -74,6 +74,33 @@ void *pmm_alloc(usize *n)
     return NULL;
 }
 
+void *pmm_alloc_continuous(usize n)
+{
+    lock_acquire(&lock);
+
+    for (;start < pmm_pages; start++)
+    {
+n:
+        if (!page_map[start])
+        {
+            for (usize i = 0; i < n; i++)
+            {
+                if (page_map[start + i])
+                {
+                    start += i + 1;
+                    goto n;
+                }
+            }
+            for (usize i = 0; i < n; i++) page_map[start + i] = 1;
+            lock_release(&lock);
+            return (void *)pmem_start + start * PAGE_SIZE;
+        }
+    }
+
+    lock_release(&lock);
+    return NULL;
+}
+
 void pmm_free(void *p, usize n)
 {
     lock_acquire(&lock);

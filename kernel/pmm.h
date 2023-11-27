@@ -8,6 +8,7 @@
 
 void pmm_init(void *fdt);
 void *pmm_alloc(usize *n);
+void *pmm_alloc_continuous(usize n);
 void pmm_free(void *p, usize n);
 
 extern u64 pmem_start;
